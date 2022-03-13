@@ -30,7 +30,7 @@ func Printvar(place string, a ...interface{}) {
 			return
 		}
 		fmt.Print("json encode:")
-		fmt.Print(dataJson, " ")
+		fmt.Print(string(dataJson), " ")
 	}
 	fmt.Print("\n")
 }
