@@ -9,4 +9,5 @@ import (
 func init() {
 	beego.Router("/", &controllers.MainController{})
 	beego.Router("/blog", &controllers.BlogController{})
+	beego.Router("/file", &controllers.FileController{})
 }

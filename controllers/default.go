@@ -22,13 +22,29 @@ type ErrorController struct {
 	beego.Controller
 }
 
+type UploadController struct {
+	beego.Controller
+}
+
+type FileController struct {
+	beego.Controller
+}
+
 type blog struct {
 	Id int64 `form:"id"`
 }
 
+//------------------------------------------------
+//MainController
+//------------------------------------------------
+
 func (c *MainController) Get() {
 	c.TplName = "First.tpl"
 }
+
+//------------------------------------------------
+//BlogController
+//------------------------------------------------
 
 func (c *BlogController) Get() {
 	blog := blog{}
@@ -50,7 +66,37 @@ func (c *BlogController) Get() {
 	}
 }
 
+//------------------------------------------------
+//FileController
+//------------------------------------------------
+
+func (c *FileController) Post() {
+	if password := c.GetString("password"); password == "laffey98" {
+		f, h, err := c.GetFile("uploadname")
+		if err != nil {
+			print.Printerr(err, place)
+		}
+		defer f.Close()
+		c.SaveToFile("uploadname", "static/upload/"+h.Filename)
+	} else {
+		c.Abort("Uploaderror")
+	}
+}
+
+func (c *FileController) Get() {
+	c.TplName = "Filelist.tpl"
+}
+
+//------------------------------------------------
+//ErrorController
+//------------------------------------------------
+
 func (c *ErrorController) ErrorNotfind() {
 	//c.Data["content"] = "page not found"
 	c.TplName = "Notfind.tpl"
+}
+
+func (c *ErrorController) ErrorUploaderror() {
+	//c.Data["content"] = "page not found"
+	c.TplName = "Uploaderror.tpl"
 }
