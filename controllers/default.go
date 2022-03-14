@@ -39,6 +39,9 @@ type blog struct {
 //------------------------------------------------
 
 func (c *MainController) Get() {
+	/* 	//text
+	   	word, _ := beego.AppConfig.String("uploadpassword")
+	   	print.Printvar(place, word) */
 	c.TplName = "First.tpl"
 }
 
@@ -71,20 +74,26 @@ func (c *BlogController) Get() {
 //------------------------------------------------
 
 func (c *FileController) Post() {
-	if password := c.GetString("password"); password == "laffey98" {
+	password := c.GetString("password")
+	word, err := beego.AppConfig.String("uploadpassword")
+	if err != nil {
+		print.Printerr(err, place)
+		c.Abort("Uploaderror")
+	}
+	if password == word {
 		f, h, err := c.GetFile("uploadname")
 		if err != nil {
 			print.Printerr(err, place)
 		}
 		defer f.Close()
-		c.SaveToFile("uploadname", "static/upload/"+h.Filename)
+		c.SaveToFile("uploadname", "static/download/"+h.Filename)
 	} else {
 		c.Abort("Uploaderror")
 	}
 }
 
 func (c *FileController) Get() {
-	c.TplName = "Filelist.tpl"
+	c.TplName = "File.tpl"
 }
 
 //------------------------------------------------
