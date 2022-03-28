@@ -10,9 +10,12 @@
     <link rel="shortcut icon " type="images/x-icon" href="static\img\32.ico">
     <style>
         body {
-            background-color: rgb(204, 212, 230);
+            background-color: rgb(211, 137, 0);
             display: flex;
             justify-content: center;
+            background-repeat: no-repeat;
+            background-position:top;
+            background-size:100%;
         }
 
         .a {
@@ -20,7 +23,7 @@
             width: 700px;
             height: 400px;
             border: #fff 10px solid;
-            background-color: rgb(120, 140, 200);
+            background-color: rgb(142, 166, 240);
             top: 120px;
             border-radius: 20px;
             overflow: hidden;
@@ -114,12 +117,12 @@
             opacity: 1;
         }
 
-        #baoxiang{
-            color:gold
+        #baoxiang {
+            color: gold
         }
 
-        #yinliao{
-            color:rgb(255, 166, 0)
+        #yinliao {
+            color: rgb(255, 166, 0)
         }
 
         .f {
@@ -149,7 +152,7 @@
             line-height: 45px;
             text-align: center;
             vertical-align: middle;
-            font-size:30px;
+            font-size: 30px;
         }
 
         .f k form {
@@ -180,26 +183,6 @@
             box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
         }
 
-        .f k form .qq {
-            height: 45px;
-            width: 45px;
-            border-radius: 100%;
-            background-color: #f17979;
-            font-size: 12px;
-            color: rgb(0, 6, 65);
-            border: 2px solid #64c1ff;
-            -webkit-transition-duration: 0.4s;
-            transition-duration: 0.4s;
-            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-
-        }
-
-        .f k form .qq :hover {
-            background-color: #64c1ff;
-            color: white;
-            box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
-        }
-
         .a:hover .f {
             transition: 1s 1.3s;
             opacity: 1;
@@ -211,7 +194,7 @@
     </style>
 </head>
 
-<body>
+<body background="static\img\cl005.png">
     <!-- 名片分三大块
     最外层的一块a
     文字一大块b
@@ -221,7 +204,8 @@
         <div class="b">
             <a>laffey98的知识宝库</a>
             <h2>welcome to you!</h2>
-            <span>请将鼠标移动进来,开启宝库吧！<br><br>宝库中存放着两堆宝藏 <i id="baoxiang" class="iconfont icon-baoxiang"></i> :<br>1. 随心随性写的个人博客<br>2.
+            <span>请将鼠标移动进来,开启宝库吧！<br><br>宝库中存放着两堆宝藏 <i id="baoxiang" class="iconfont icon-baoxiang"></i> :<br>1.
+                随心随性写的个人博客<br>2.
                 收集的各种资源（可公开的）</br><br>主要是为自己而写，方便以后查找，有兴趣的话就看看吧，欢迎你的到来！<br /><br />对了，我喜欢创造和茉莉蜜茶<i id="yinliao"
                     class="iconfont icon-yinliao"></i>！<br>再次欢迎你的来访！</span>
         </div>
@@ -258,10 +242,8 @@
             <k>
                 <a target="_blank" href="https://github.com/laffey98"><i class="iconfont icon-github"
                         title="GitHub"></i></a>
-                <a target="_blank" href="http://localhost:8080/blog?id=5"><i class="iconfont icon-qq"
-                        title="QQ"></i></a>
-                <a target="_blank" href="http://localhost:8080/blog?id=5"><i class="iconfont icon-weixin"
-                        title="WeiXin"></i></a>
+                <a href="http://localhost:8080/blog?id=5"><i class="iconfont icon-qq" title="QQ"></i></a>
+                <a href="http://localhost:8080/blog?id=5"><i class="iconfont icon-weixin" title="WeiXin"></i></a>
             </k>
 
         </div>

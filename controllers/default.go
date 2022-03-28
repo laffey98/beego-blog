@@ -87,9 +87,18 @@ func (c *BlogController) Get() {
 
 	switch {
 	case blog.Id > 0 && blog.Id < 100:
-		c.TplName = "NorAndMd.tpl"
+		c.Data["title"] = blog.name
+		c.Layout = "NorAndMd.tpl"
+		c.TplName = "normal.tpl"
+		c.LayoutSections = make(map[string]string)
+		c.LayoutSections["markdown"] = "markdown.tpl"
 	case blog.Id > 10000000 && blog.Id < 99999999:
-		c.TplName = "NME.tpl"
+		c.Data["title"] = blog.name
+		c.Layout = "NME.tpl"
+		c.TplName = "normal.tpl"
+		c.LayoutSections = make(map[string]string)
+		c.LayoutSections["markdown"] = "markdown.tpl"
+		c.LayoutSections["ex_blog"] = "ex_blog.tpl"
 	default:
 		c.Abort("Notfind")
 	}
