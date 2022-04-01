@@ -1,8 +1,12 @@
 package controllers
 
 import (
+	"fmt"
 	"hello/print"
 	"io/ioutil"
+	"os"
+	"strings"
+	"time"
 
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/russross/blackfriday"
@@ -12,6 +16,9 @@ import (
 const (
 	place = "controllers"
 )
+
+var blog_num int
+var blog_today string
 
 type Config struct {
 	Data map[int64]string
@@ -115,19 +122,41 @@ func (c *BlogController) Get() {
 //------------------------------------------------
 
 func (c *FileController) Post() {
-	password := c.GetString("password")
-	word, err := beego.AppConfig.String("uploadpassword")
+	file_password := c.GetString("filepassword")
+	blog_password := c.GetString("blogpassword")
+	file_word, err := beego.AppConfig.String("fileword")
 	if err != nil {
 		print.Printerr(err, place)
 		c.Abort("Uploaderror")
 	}
-	if password == word {
-		f, h, err := c.GetFile("uploadname")
+	blog_word, err := beego.AppConfig.String("blogword")
+	if err != nil {
+		print.Printerr(err, place)
+		c.Abort("Uploaderror")
+	}
+	if file_password == file_word {
+		f, h, err := c.GetFile("filename")
 		if err != nil {
 			print.Printerr(err, place)
 		}
 		defer f.Close()
-		c.SaveToFile("uploadname", "static/download/"+h.Filename)
+		c.SaveToFile("filename", "static/download/"+h.Filename)
+		c.Data["upload"] = true
+	} else {
+		c.Abort("Uploaderror")
+	}
+
+	if blog_password == blog_word {
+		f, h, err := c.GetFile("blogname")
+		if err != nil {
+			print.Printerr(err, place)
+		}
+		defer f.Close()
+		c.SaveToFile("blogname", "blog/"+h.Filename)
+		er := write2yaml(h.Filename)
+		if er == "Uploaderror" {
+			c.Abort(er)
+		}
 		c.Data["upload"] = true
 	} else {
 		c.Abort("Uploaderror")
@@ -206,4 +235,54 @@ func md2html(name string) string {
 		print.Printvar("md2html", "WriteFile Success!")
 	}
 	return "success"
+}
+
+//------------------------------------------------
+//write to yaml
+//------------------------------------------------
+
+func write2yaml(name string) string {
+	//file_path := `conf\` + "blog.yaml"
+	yaml, readErr := os.OpenFile(`conf\blog.yaml`, os.O_RDWR, 0666)
+	if readErr != nil {
+		print.Printerr(readErr, "write2yaml")
+		return "Uploaderror"
+	}
+	yaml_value := strings.Replace(name, ".md", "", 1)
+	year := time.Now().Year() - 2000
+	month := time.Now().Month()
+	day := time.Now().Day()
+	syear := fmt.Sprintf("%d", year)
+	smonth := fmt.Sprintf("%d", month)
+	sday := fmt.Sprintf("%d", day)
+	if month < 10 {
+		smonth = "0" + smonth
+	}
+	if day < 10 {
+		sday = "0" + sday
+	}
+
+	today := syear + smonth + sday
+	if blog_today == today {
+		blog_num++
+	} else {
+		blog_today = today
+	}
+	sblog_num := fmt.Sprintf("%d", blog_num)
+	if blog_num < 10 {
+		sblog_num = "0" + sblog_num
+	}
+	n, err := yaml.Seek(0, os.SEEK_END)
+	if err != nil {
+		print.Printerr(err, "write2yaml")
+	}
+	_, err = yaml.WriteAt([]byte(today+sblog_num+": "+yaml_value+"\n"), n)
+
+	//_, err := yaml.WriteString(string(year) + string(month) + string(day) + yaml_value + "\n")
+	if err != nil {
+		print.Printerr(err, "write2yaml")
+		return "Uploaderror"
+	}
+	defer yaml.Close()
+	return "OK"
 }
