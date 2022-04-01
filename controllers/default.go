@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 
 	beego "github.com/beego/beego/v2/server/web"
+	"github.com/russross/blackfriday"
 	"gopkg.in/yaml.v2"
 )
 
@@ -84,6 +85,11 @@ func (c *BlogController) Get() {
 	if blog.name == "nofind" {
 		c.Abort("Notfind")
 	}
+	//md to html
+	md := md2html(blog.name)
+	if md != "success" {
+		c.Abort(md)
+	}
 
 	switch {
 	case blog.Id > 0 && blog.Id < 100:
@@ -146,6 +152,11 @@ func (c *ErrorController) ErrorUploaderror() {
 	c.TplName = "Uploaderror.tpl"
 }
 
+func (c *ErrorController) ErrorSthwrong() {
+	//c.Data["content"] = "page not found"
+	c.TplName = "Sthwrong.tpl"
+}
+
 //------------------------------------------------
 //parse config
 //------------------------------------------------
@@ -162,7 +173,7 @@ func (c *Config) Config() {
 		//fmt.Print(err)
 		print.Printerr(err, "ConfigPrase")
 	}
-	print.Printvar("ConfigParse", c.Data)
+	//print.Printvar("ConfigParse", c.Data)
 }
 
 func (c *Config) Find(id int64) string {
@@ -171,4 +182,28 @@ func (c *Config) Find(id int64) string {
 		return "nofind"
 	}
 	return c.Data[id]
+}
+
+//------------------------------------------------
+//md to html
+//------------------------------------------------
+
+func md2html(name string) string {
+	file_path := `blog\` + name + ".md"
+	md, readErr := ioutil.ReadFile(file_path)
+	if readErr != nil {
+		print.Printerr(readErr, "md2html")
+		return "Sthwrong"
+		//c.Abort("Sthwrong")
+	}
+	output := blackfriday.MarkdownCommon(md)
+	err := ioutil.WriteFile("views\\markdown.tpl", output, 0644)
+	if err != nil {
+		print.Printerr(err, "md2html")
+		return "Sthwrong"
+		//c.Abort("Sthwrong")
+	} else {
+		print.Printvar("md2html", "WriteFile Success!")
+	}
+	return "success"
 }

@@ -15,10 +15,10 @@
                 <a class="" href="http://localhost:8080/file" title="资源下载"><i class="iconfont icon-xiazai"></i><span>资源下载</span></a>
             </li>
             <li>
-                <a class="" href="http://localhost:8080/blog?id=4" title="站内自用"><i class="iconfont icon-ziyong"></i><span>站内自用</span></a>
+                <a class="" href="http://localhost:8080/blog?id=3" title="站内自用"><i class="iconfont icon-ziyong"></i><span>站内自用</span></a>
             </li>
             <li>
-                <a class="" href="http://localhost:8080/blog?id=3" title="关于我"><i class="iconfont icon-guanyuwo"></i><span>关于我</span></a>
+                <a class="" href="http://localhost:8080/blog?id=4" title="关于我"><i class="iconfont icon-guanyuwo"></i><span>关于我</span></a>
             </li>
         </ul>
         <ul class="buttons">

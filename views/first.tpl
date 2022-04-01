@@ -188,9 +188,6 @@
             opacity: 1;
         }
 
-        .iconfont icon-qq::before {
-            content: "123";
-        }
     </style>
 </head>
 
