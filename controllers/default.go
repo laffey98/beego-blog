@@ -99,18 +99,28 @@ func (c *BlogController) Get() {
 	}
 
 	switch {
-	case blog.Id > 0 && blog.Id < 100:
+	case blog.Id == 2:
+		c.Data["title"] = blog.name
+		c.Data["blog_map"] = config.Data
+		c.Layout = "Achieve.tpl"
+		c.TplName = "normal.tpl"
+	case blog.Id > 2 && blog.Id < 100:
 		c.Data["title"] = blog.name
 		c.Layout = "NorAndMd.tpl"
 		c.TplName = "normal.tpl"
 		c.LayoutSections = make(map[string]string)
-		c.LayoutSections["markdown"] = "markdown.tpl"
+		c.LayoutSections["markdown"] = "markdown.html"
 	case blog.Id > 10000000 && blog.Id < 99999999:
 		c.Data["title"] = blog.name
 		c.Layout = "NME.tpl"
 		c.TplName = "normal.tpl"
+		modtime := get_modtime(blog.name)
+		if modtime == "Notfind" {
+			c.Abort(modtime)
+		}
+		c.Data["writetime"] = modtime
 		c.LayoutSections = make(map[string]string)
-		c.LayoutSections["markdown"] = "markdown.tpl"
+		c.LayoutSections["markdown"] = "markdown.html"
 		c.LayoutSections["ex_blog"] = "ex_blog.tpl"
 	default:
 		c.Abort("Notfind")
@@ -125,46 +135,67 @@ func (c *FileController) Post() {
 	file_password := c.GetString("filepassword")
 	blog_password := c.GetString("blogpassword")
 	file_word, err := beego.AppConfig.String("fileword")
+	print.Printvar(place, file_password)
 	if err != nil {
 		print.Printerr(err, place)
 		c.Abort("Uploaderror")
 	}
 	blog_word, err := beego.AppConfig.String("blogword")
+	print.Printvar(place, blog_password)
 	if err != nil {
 		print.Printerr(err, place)
 		c.Abort("Uploaderror")
 	}
-	if file_password == file_word {
-		f, h, err := c.GetFile("filename")
-		if err != nil {
-			print.Printerr(err, place)
+
+	a := false
+
+	if file_password != "" {
+		if file_password == file_word {
+			f, h, err := c.GetFile("filename")
+			if err != nil {
+				print.Printerr(err, place)
+			}
+			defer f.Close()
+			c.SaveToFile("filename", "static/download/"+h.Filename)
+			c.Data["upload"] = "block"
+		} else {
+			c.Abort("Uploaderror")
 		}
-		defer f.Close()
-		c.SaveToFile("filename", "static/download/"+h.Filename)
-		c.Data["upload"] = true
-	} else {
-		c.Abort("Uploaderror")
+		a = true
 	}
 
-	if blog_password == blog_word {
-		f, h, err := c.GetFile("blogname")
-		if err != nil {
-			print.Printerr(err, place)
+	if blog_password != "" {
+		if blog_password == blog_word {
+			f, h, err := c.GetFile("blogname")
+			if err != nil {
+				print.Printerr(err, place)
+			}
+			defer f.Close()
+			c.SaveToFile("blogname", "blog/"+h.Filename)
+			er := write2yaml(h.Filename)
+			if er == "Uploaderror" {
+				c.Abort(er)
+			}
+			c.Data["upload"] = "block"
+		} else {
+			c.Abort("Uploaderror")
 		}
-		defer f.Close()
-		c.SaveToFile("blogname", "blog/"+h.Filename)
-		er := write2yaml(h.Filename)
-		if er == "Uploaderror" {
-			c.Abort(er)
-		}
-		c.Data["upload"] = true
-	} else {
+		a = true
+	}
+
+	if !a {
 		c.Abort("Uploaderror")
 	}
+	c.Data["title"] = "在线文件"
+	c.Layout = "File.tpl"
+	c.TplName = "normal.tpl"
 }
 
 func (c *FileController) Get() {
-	c.TplName = "File.tpl"
+	c.Data["upload"] = "none"
+	c.Data["title"] = "在线文件"
+	c.Layout = "File.tpl"
+	c.TplName = "normal.tpl"
 }
 
 //------------------------------------------------
@@ -226,7 +257,7 @@ func md2html(name string) string {
 		//c.Abort("Sthwrong")
 	}
 	output := blackfriday.MarkdownCommon(md)
-	err := ioutil.WriteFile("views\\markdown.tpl", output, 0644)
+	err := ioutil.WriteFile("views\\markdown.html", output, 0644)
 	if err != nil {
 		print.Printerr(err, "md2html")
 		return "Sthwrong"
@@ -238,10 +269,37 @@ func md2html(name string) string {
 }
 
 //------------------------------------------------
-//write to yaml
+//file logic func
 //------------------------------------------------
 
 func write2yaml(name string) string {
+	na := strings.Replace(name, ".md", "", 1)
+	content, err := ioutil.ReadFile(`conf\blog.yaml`)
+	if err != nil {
+		print.Printerr(err, "write2yaml")
+	}
+	offset := strings.Index(string(content), na)
+	print.Printvar("write2yaml-offset", offset)
+	if offset > 0 {
+		ppp, err := os.OpenFile(`conf\blog.yaml`, os.O_RDWR, 0666)
+		if err != nil {
+			print.Printerr(err, "write2yaml")
+			return "Uploaderror"
+		}
+		x, err := ppp.Seek(int64(offset), 0)
+		print.Printvar("write2yaml-seek", x)
+		if err != nil {
+			print.Printerr(err, "write2yaml")
+			return "Uploaderror"
+		}
+		start := content[:x-12]
+		b := content[x+int64(len(na)):]
+		new := append(start, b...)
+		print.Printvar("write2yaml", string(start))
+		print.Printvar("write2yaml", string(new))
+		ioutil.WriteFile(`conf\blog.yaml`, new, 0777)
+		ppp.Close()
+	}
 	//file_path := `conf\` + "blog.yaml"
 	yaml, readErr := os.OpenFile(`conf\blog.yaml`, os.O_RDWR, 0666)
 	if readErr != nil {
@@ -285,4 +343,14 @@ func write2yaml(name string) string {
 	}
 	defer yaml.Close()
 	return "OK"
+}
+
+func get_modtime(name string) string {
+	file_path := `blog\` + name + ".md"
+	info, err := os.Stat(file_path)
+	if err != nil {
+		print.Printerr(err, "get_modtime")
+		return "Notfind"
+	}
+	return info.ModTime().String()
 }

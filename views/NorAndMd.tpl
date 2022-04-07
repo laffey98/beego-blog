@@ -53,7 +53,7 @@
 </head>
 
 <body>
-    <div>{{.LayoutContent}}</div>
+    <div>{{str2html .LayoutContent}}</div>
     <div class="md">
         <div class="markdown-body">{{.markdown}}</div>
     </div>

@@ -9,6 +9,7 @@ import (
 
 func main() {
 	beego.ErrorController(&controllers.ErrorController{})
-	beego.SetStaticPath("/download", "static/download")
+	beego.SetStaticPath("/downloadfile", "static/download")
+	beego.SetStaticPath("/downloadblog", "blog")
 	beego.Run()
 }

@@ -6,7 +6,7 @@
         </div>
         <ul class="buttons">
             <li>
-                <a class="" href="http://localhost:8080" title="首页"><i class="iconfont icon-shouye"></i><span>首页</span></a>
+                <a class="" href="http://localhost:8080/first" title="首页"><i class="iconfont icon-shouye"></i><span>首页</span></a>
             </li>
             <li>
                 <a class="" href="http://localhost:8080/blog?id=2" title="归档"><i class="iconfont icon-guidang"></i><span>归档</span></a>
