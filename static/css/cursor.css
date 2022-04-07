@@ -1,0 +1,22 @@
+html {
+    cursor: url('../img/Arrow.ani'), auto;
+    /* cursor: url('static/img/wait.ani'), wait;
+cursor: url('static/img/text.ani'), text;
+cursor: url('static/img/hand2.ani'), pointer; */
+}
+
+a{
+    cursor: url('../img/hand2.ani'), pointer;
+}
+
+input{
+    cursor: url('../img/hand2.ani'), pointer;
+}
+
+input[type=password]{
+    cursor: url('../img/text.ani'), text;
+}
+
+p{
+    cursor: url('../img/text.ani'), text;
+}

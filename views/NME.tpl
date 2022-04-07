@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="static\css\normal.css" />
     <link rel="stylesheet" type="text/css" href="static\css\markdown.css" />
     <link rel="shortcut icon " type="images/x-icon" href="static\img\32.ico">
+    <link rel="stylesheet" href="static/css/cursor.css">
     <link rel="stylesheet" href="http://at.alicdn.com/t/font_3280378_epazboq4thv.css">
     <link rel="stylesheet" href="static/css/github-markdown-light.css">
     <style>
@@ -53,9 +54,9 @@
 </head>
 
 <body>
-    <div>{{str2html .LayoutContent}}</div>
+    <div>{{.LayoutContent}}</div>
     <div class="md">
-        <div class="markdown-body">{{.markdown}}</div>
+        <div class="markdown-body">{{str2html .markdown}}</div>
         <div class="extra">{{.ex_blog}}</div>
     </div>
 </body>

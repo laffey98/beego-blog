@@ -1,1 +1,413 @@
-<p>123</p>
+<h1>beego框架学习之controller(2)</h1>
+
+<h2>获取参数</h2>
+
+<p>我们经常需要获取用户传递的数据，包括 Get、POST 等方式的请求，beego 里面会自动解析这些数据，你可以通过如下方式获取数据：</p>
+
+<ul>
+<li>GetString(key string) string</li>
+<li>GetStrings(key string) []string</li>
+<li>GetInt(key string) (int64, error)</li>
+<li>GetBool(key string) (bool, error)</li>
+
+<li><p>GetFloat(key string) (float64, error)
+使用例子如下：</p>
+
+<pre><code class="language-go">func (this *MainController) Post() {
+jsoninfo := this.GetString(&quot;jsoninfo&quot;)
+if jsoninfo == &quot;&quot; {
+    this.Ctx.WriteString(&quot;jsoninfo is empty&quot;)
+    return
+}
+}
+</code></pre>
+
+<p>如果需要的数据可能是其他类型的，例如是 int 类型而不是 int64，那么需要这样处理：</p>
+
+<pre><code class="language-go">func (this *MainController) Post() {
+id := this.Input().Get(&quot;id&quot;)
+intid, err := strconv.Atoi(id)
+}
+</code></pre>
+
+<h3>直接解析到 struct</h3>
+
+<p>如果要把表单里的内容赋值到一个 struct 里，除了用上面的方法一个一个获取再赋值外，beego 提供了通过另外一个更便捷的方式，就是通过 struct 的字段名或 tag 与表单字段对应直接解析到 struct。</p>
+
+<pre><code class="language-go">//定义 struct：
+type user struct {
+Id    int         `form:&quot;-&quot;`
+Name  interface{} `form:&quot;username&quot;`
+Age   int         `form:&quot;age&quot;`
+Email string
+}
+</code></pre>
+
+<p>表单：</p>
+
+<pre><code class="language-html">名字：&lt;input name=&quot;username&quot; type=&quot;text&quot; /&gt;
+年龄：&lt;input name=&quot;age&quot; type=&quot;text&quot; /&gt;
+邮箱：&lt;input name=&quot;Email&quot; type=&quot;text&quot; /&gt;
+&lt;input type=&quot;submit&quot; value=&quot;提交&quot; /&gt;
+
+</code></pre>
+
+<pre><code class="language-go">//Controller 里解析：
+func (this *MainController) Post() {
+u := user{}
+if err := this.ParseForm(&amp;u); err != nil {
+    //handle error
+}
+}
+</code></pre></li>
+</ul>
+
+<p>注意：</p>
+
+<ul>
+<li>StructTag form 的定义和 renderform方法 共用一个标签</li>
+
+<li><p>定义 struct 时，字段名后如果有 form 这个 tag，则会以把 form 表单里的 name 和 tag 的名称一样的字段赋值给这个字段，否则就会把 form 表单里与字段名一样的表单内容赋值给这个字段。如上面例子中，会把表单中的 username 和 age 分别赋值给 user 里的 Name 和 Age 字段，而 Email 里的内容则会赋给 Email 这个字段。</p></li>
+
+<li><p>调用 Controller ParseForm 这个方法的时候，传入的参数必须为一个 struct 的指针，否则对 struct 的赋值不会成功并返回 xx must be a struct pointer 的错误。</p></li>
+
+<li><p>如果要忽略一个字段，有两种办法，一是：字段名小写开头，二是：form 标签的值设置为 -</p></li>
+</ul>
+
+<h3>获取 Request Body 里的内容</h3>
+
+<p>在 API 的开发中，我们经常会用到 <code>JSON</code> 或 <code>XML</code> 来作为数据交互的格式，如何在 beego 中获取 Request Body 里的 JSON 或 XML 的数据呢？</p>
+
+<ol>
+<li>在配置文件里设置 <code>copyrequestbody = true</code></li>
+
+<li><p>在 Controller 中</p>
+
+<pre><code class="language-go">func (this *ObjectController) Post() {
+var ob models.Object
+var err error
+if err = json.Unmarshal(this.Ctx.Input.RequestBody, &amp;ob); err == nil {
+    objectid := models.AddOne(ob)
+    this.Data[&quot;json&quot;] = &quot;{\&quot;ObjectId\&quot;:\&quot;&quot; + objectid + &quot;\&quot;}&quot;
+} else {
+    this.Data[&quot;json&quot;] = err.Error()
+}
+this.ServeJSON()
+}
+</code></pre></li>
+</ol>
+
+<h3>文件上传</h3>
+
+<p>在 beego 中可以很容易的处理文件上传，就是别忘记在form 表单中增加这个属性 <code>enctype=&quot;multipart/form-data&quot;</code>，否则浏览器不会传输上传文件。</p>
+
+<p>文件上传之后一般是放在系统的内存里面，如果文件的 size 大于设置的缓存内存大小，那么就放在临时文件中，默认的缓存内存是 64M，可以通过如下来调整这个缓存内存大小:</p>
+
+<pre><code class="language-go">web.MaxMemory = 1&lt;&lt;22
+</code></pre>
+
+<p>或者在配置文件中通过如下设置：</p>
+
+<pre><code>maxmemory = 1&lt;&lt;22
+</code></pre>
+
+<p>与此同时，beego 提供了另外一个参数，<code>MaxUploadSize</code>来限制最大上传文件大小——如果你一次长传多个文件，那么它限制的就是这些所有文件合并在一起的大小。</p>
+
+<p>默认情况下，<code>MaxMemory</code>应该设置得比<code>MaxUploadSize</code>小，这种情况下两个参数合并在一起的效果则是：</p>
+
+<ol>
+<li>如果文件大小小于<code>MaxMemory</code>，则直接在内存中处理；</li>
+<li>如果文件大小介于<code>MaxMemory</code>和<code>MaxUploadSize</code>之间，那么比<code>MaxMemory</code>大的部分将会放在临时目录；</li>
+<li>文件大小超出<code>MaxUploadSize</code>，直接拒绝请求，返回响应码 413</li>
+</ol>
+
+<p>Beego 提供了两个很方便的方法来处理文件上传：</p>
+
+<ul>
+<li>GetFile(key string) (multipart.File, *multipart.FileHeader, error)</li>
+</ul>
+
+<p>该方法主要用于用户读取表单中的文件名 <code>the_file</code>，然后返回相应的信息，用户根据这些变量来处理文件上传：过滤、保存文件等。</p>
+
+<ul>
+<li>SaveToFile(fromfile, tofile string) error</li>
+</ul>
+
+<p>该方法是在 GetFile 的基础上实现了快速保存的功能
+  fromfile 是提交时候的 html 表单中的 name</p>
+
+<pre><code>&lt;form enctype=&quot;multipart/form-data&quot; method=&quot;post&quot;&gt;
+    &lt;input type=&quot;file&quot; name=&quot;uploadname&quot; /&gt;
+    &lt;input type=&quot;submit&quot;&gt;
+&lt;/form&gt;
+</code></pre>
+
+<p>保存的代码例子如下：</p>
+
+<pre><code class="language-go">func (c *FormController) Post() {
+    f, h, err := c.GetFile(&quot;uploadname&quot;)
+    if err != nil {
+        log.Fatal(&quot;getfile err &quot;, err)
+    }
+    defer f.Close()
+    c.SaveToFile(&quot;uploadname&quot;, &quot;static/upload/&quot; + h.Filename) // 保存位置在 static/upload, 没有文件夹要先创建
+    
+}
+</code></pre>
+
+<h3>数据绑定</h3>
+
+<p>支持从用户请求中直接数据 bind 到指定的对象,例如请求地址如下</p>
+
+<pre><code>?id=123&amp;isok=true&amp;ft=1.2&amp;ol[0]=1&amp;ol[1]=2&amp;ul[]=str&amp;ul[]=array
+</code></pre>
+
+<pre><code class="language-go">var id int
+this.Ctx.Input.Bind(&amp;id, &quot;id&quot;)  //id ==123
+
+var isok bool
+this.Ctx.Input.Bind(&amp;isok, &quot;isok&quot;)  //isok ==true
+
+var ft float64
+this.Ctx.Input.Bind(&amp;ft, &quot;ft&quot;)  //ft ==1.2
+
+ol := make([]int, 0, 2)
+this.Ctx.Input.Bind(&amp;ol, &quot;ol&quot;)  //ol ==[1 2]
+
+ul := make([]string, 0, 2)
+this.Ctx.Input.Bind(&amp;ul, &quot;ul&quot;)  //ul ==[str array]
+
+</code></pre>
+
+<h2>跨站请求伪造</h2>
+
+<blockquote>
+<p>目前用不上，不详细说明了，了解了解</p>
+</blockquote>
+
+<p><a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">跨站请求伪造(Cross-site request forgery)</a>， 简称为 XSRF，是 Web 应用中常见的一个安全问题。前面的链接也详细讲述了 XSRF 攻击的实现方式。</p>
+
+<p>当前防范 XSRF 的一种通用的方法，是对每一个用户都记录一个无法预知的 cookie 数据，然后要求所有提交的请求（POST/PUT/DELETE）中都必须带有这个 cookie 数据。如果此数据不匹配 ，那么这个请求就可能是被伪造的。</p>
+
+<p>beego 有内建的 XSRF 的防范机制，要使用此机制，你需要在应用配置文件中加上 <code>enablexsrf</code> 设定</p>
+
+<h2>过滤器</h2>
+
+<blockquote>
+<p>不同的过滤器在不同的时段自动调用，具体看（1）里的MVC架构的图</p>
+</blockquote>
+
+<p>beego 支持自定义过滤中间件，例如安全验证，强制跳转等。</p>
+
+<p>过滤器函数如下所示：</p>
+
+<pre><code>web.InsertFilter(pattern string, pos int, filter FilterFunc, opts ...FilterOpt)
+</code></pre>
+
+<p>InsertFilter 函数的三个必填参数，一个可选参数</p>
+
+<ul>
+<li>pattern 路由规则，可以根据一定的规则进行路由，如果你全匹配可以用 <code>*</code></li>
+<li>position 执行 Filter 的地方，五个固定参数如下，分别表示不同的执行过程
+
+<ul>
+<li>BeforeStatic 静态地址之前</li>
+<li>BeforeRouter 寻找路由之前</li>
+<li>BeforeExec 找到路由之后，开始执行相应的 Controller 之前</li>
+<li>AfterExec 执行完 Controller 逻辑之后执行的过滤器</li>
+<li>FinishRouter 执行完逻辑之后执行的过滤器</li>
+</ul></li>
+<li>filter filter 函数 type FilterFunc func(*context.Context)</li>
+<li>opts
+
+<ol>
+<li>web.WithReturnOnOutput: 设置 returnOnOutput 的值(默认 true), 如果在进行到此过滤之前已经有输出，是否不再继续执行此过滤器,默认设置为如果前面已有输出(参数为true)，则不再执行此过滤器</li>
+<li>web.WithResetParams: 是否重置 filters 的参数，默认是 false，因为在 filters 的 pattern 和本身的路由的 pattern 冲突的时候，可以把 filters 的参数重置，这样可以保证在后续的逻辑中获取到正确的参数，例如设置了 <code>/api/*</code> 的 filter，同时又设置了 <code>/api/docs/*</code> 的 router，那么在访问 <code>/api/docs/swagger/abc.js</code> 的时候，在执行 filters 的时候设置 <code>:splat</code> 参数为 <code>docs/swagger/abc.js</code>，但是如果不清楚 filter 的这个路由参数，就会在执行路由逻辑的时候保持 <code>docs/swagger/abc.js</code>，如果设置了 true，就会重置 <code>:splat</code> 参数.</li>
+<li>web.WithCaseSensitive: 是否大小写敏感。</li>
+</ol></li>
+</ul>
+
+<p>如下例子所示，验证用户是否已经登录，应用于全部的请求：</p>
+
+<pre><code class="language-go">var FilterUser = func(ctx *context.Context) {
+    _, ok := ctx.Input.Session(&quot;uid&quot;).(int)
+    if !ok &amp;&amp; ctx.Request.RequestURI != &quot;/login&quot; {
+        ctx.Redirect(302, &quot;/login&quot;)
+    }
+}
+
+web.InsertFilter(&quot;/*&quot;, web.BeforeRouter, FilterUser)
+</code></pre>
+
+<blockquote>
+<blockquote>
+<blockquote>
+<p>这里需要特别注意使用 session 的 Filter 必须在 BeforeStatic 之后才能获取，因为 session 没有在这之前初始化。</p>
+</blockquote>
+</blockquote>
+</blockquote>
+
+<p>还可以通过正则路由进行过滤，如果匹配参数就执行：</p>
+
+<pre><code>var FilterUser = func(ctx *context.Context) {
+    _, ok := ctx.Input.Session(&quot;uid&quot;).(int)
+    if !ok {
+        ctx.Redirect(302, &quot;/login&quot;)
+    }
+}
+web.InsertFilter(&quot;/user/:id([0-9]+)&quot;, web.BeforeRouter, FilterUser)
+</code></pre>
+
+<h3>过滤器实现路由</h3>
+
+<blockquote>
+<p>有点类似重定向，因为本质上改变了控制器</p>
+</blockquote>
+
+<p>beego1.1.2 开始 Context.Input 中增加了 RunController 和 RunMethod, 这样我们就可以在执行路由查找之前,在 filter 中实现自己的路由规则.</p>
+
+<p>如下示例实现了如何实现自己的路由规则:</p>
+
+<pre><code class="language-go">var UrlManager = func(ctx *context.Context) {
+    // 数据库读取全部的 url mapping 数据
+    urlMapping := model.GetUrlMapping()
+    for baseurl,rule:=range urlMapping {
+        if baseurl == ctx.Request.RequestURI {
+            ctx.Input.RunController = rule.controller
+            ctx.Input.RunMethod = rule.method
+            break
+        }
+    }
+}
+
+web.InsertFilter(&quot;/*&quot;, web.BeforeRouter, web.UrlManager)
+</code></pre>
+
+<h3>Filter和FilterChain</h3>
+
+<blockquote>
+<p>估计能用上的环境太少，毕竟过滤器都是可能用的上，这种嵌套实现挺好，但用不上</p>
+</blockquote>
+
+<p>在 v1.x 的设计中，Filter 并不能直接调用下一个 Filter。这导致了我们无法解决一个问题，即我们希望这个 Filter 能够在代码执行前后都执行一段逻辑。</p>
+
+<p>例如，在考虑接入<code>Opentracing</code>和<code>prometheus</code>的时候，我们就遇到了这种问题。</p>
+
+<p>考虑到这是一个通用的场景，我们在已有 Filter 的基础上，支持了<code>Filter-Chain</code>设计模式。</p>
+
+<pre><code class="language-go">type FilterChain func(next FilterFunc) FilterFunc
+</code></pre>
+
+<p>例如一个非常简单的例子：</p>
+
+<pre><code class="language-go">package main
+
+import (
+    &quot;github.com/beego/beego/v2/core/logs&quot;
+    &quot;github.com/beego/beego/v2/server/web&quot;
+    &quot;github.com/beego/beego/v2/server/web/context&quot;
+)
+
+func main() {
+    web.InsertFilterChain(&quot;/*&quot;, func(next web.FilterFunc) web.FilterFunc {
+        return func(ctx *context.Context) {
+            // do something
+            logs.Info(&quot;hello&quot;)
+            // don't forget this
+            next(ctx)
+
+            // do something
+        }
+    })
+}
+</code></pre>
+
+<p>这个例子里面，我们只是输出了一句”hello”，就调用了下一个 Filter。</p>
+
+<p>在执行完<code>next(ctx)</code>之后，实际上，如果后面的 Filter 没有中断整个流程，那么这时候<code>OutPut</code>对象已经被赋值了，意味着能够拿到响应码等数据。</p>
+
+<blockquote>
+<p>下面两个例子是官方给的，未来了解了<code>Opentracing</code>和<code>prometheus</code>这两玩意应该才用得上</p>
+
+<h4>Prometheus例子</h4>
+
+<pre><code>package main
+
+import (
+    &quot;time&quot;
+
+    &quot;github.com/beego/beego/v2/server/web&quot;
+    &quot;github.com/beego/beego/v2/server/web/filter/prometheus&quot;
+)
+
+func main() {
+    // we start admin service
+    // Prometheus will fetch metrics data from admin service's port
+    web.BConfig.Listen.EnableAdmin = true
+
+    web.BConfig.AppName = &quot;my app&quot;
+
+    ctrl := &amp;MainController{}
+    web.Router(&quot;/hello&quot;, ctrl, &quot;get:Hello&quot;)
+    fb := &amp;prometheus.FilterChainBuilder{}
+    web.InsertFilterChain(&quot;/*&quot;, fb.FilterChain)
+    web.Run(&quot;:8080&quot;)
+    // after you start the server
+    // and GET http://localhost:8080/hello
+    // access http://localhost:8088/metrics
+    // you can see something looks like:
+    // http_request_web_sum{appname=&quot;my app&quot;,duration=&quot;1002&quot;,env=&quot;prod&quot;,method=&quot;GET&quot;,pattern=&quot;/hello&quot;,server=&quot;webServer:1.12.1&quot;,status=&quot;200&quot;} 1002
+    // http_request_web_count{appname=&quot;my app&quot;,duration=&quot;1002&quot;,env=&quot;prod&quot;,method=&quot;GET&quot;,pattern=&quot;/hello&quot;,server=&quot;webServer:1.12.1&quot;,status=&quot;200&quot;} 1
+    // http_request_web_sum{appname=&quot;my app&quot;,duration=&quot;1004&quot;,env=&quot;prod&quot;,method=&quot;GET&quot;,pattern=&quot;/hello&quot;,server=&quot;webServer:1.12.1&quot;,status=&quot;200&quot;} 1004
+    // http_request_web_count{appname=&quot;my app&quot;,duration=&quot;1004&quot;,env=&quot;prod&quot;,method=&quot;GET&quot;,pattern=&quot;/hello&quot;,server=&quot;webServer:1.12.1&quot;,status=&quot;200&quot;} 1
+}
+
+type MainController struct {
+    web.Controller
+}
+
+func (ctrl *MainController) Hello() {
+    time.Sleep(time.Second)
+    ctrl.Ctx.ResponseWriter.Write([]byte(&quot;Hello, world&quot;))
+}
+</code></pre>
+
+<p>别忘记了开启<code>prometheus</code>的端口。在你没有启动<code>admin</code>服务的时候，需要自己手动开启。</p>
+
+<h4>Opentracing例子</h4>
+
+<pre><code>package main
+
+import (
+    &quot;time&quot;
+
+    &quot;github.com/beego/beego/v2/server/web&quot;
+    &quot;github.com/beego/beego/v2/server/web/filter/opentracing&quot;
+)
+
+func main() {
+    // don't forget this to inject the opentracing API's implementation
+    // opentracing2.SetGlobalTracer()
+
+    web.BConfig.AppName = &quot;my app&quot;
+
+    ctrl := &amp;MainController{}
+    web.Router(&quot;/hello&quot;, ctrl, &quot;get:Hello&quot;)
+    fb := &amp;opentracing.FilterChainBuilder{}
+    web.InsertFilterChain(&quot;/*&quot;, fb.FilterChain)
+    web.Run(&quot;:8080&quot;)
+    // after you start the server
+}
+
+type MainController struct {
+    web.Controller
+}
+
+func (ctrl *MainController) Hello() {
+    time.Sleep(time.Second)
+    ctrl.Ctx.ResponseWriter.Write([]byte(&quot;Hello, world&quot;))
+}
+</code></pre>
+
+<p>别忘了调用<code>opentracing</code>库的<code>SetGlobalTracer</code>方法，注入真正的<code>opentracing API</code>的实现。</p>
+</blockquote>

@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="static\css\markdown.css" />
     <link rel="shortcut icon " type="images/x-icon" href="static\img\32.ico">
     <link rel="stylesheet" href="http://at.alicdn.com/t/font_3280378_epazboq4thv.css">
+    <link rel="stylesheet" href="static/css/cursor.css">
     <link rel="stylesheet" href="static/css/github-markdown-light.css">
     <style>
         body {
@@ -43,7 +44,7 @@
             left: 300px;
             width: 500px;
             top:30px; */
-            position:relative;
+            position: relative;
             top: 35px;
             padding-left: 290px;
             padding-right: 60px;
@@ -53,9 +54,9 @@
 </head>
 
 <body>
-    <div>{{str2html .LayoutContent}}</div>
+    <div>{{.LayoutContent}}</div>
     <div class="md">
-        <div class="markdown-body">{{.markdown}}</div>
+        <div class="markdown-body">{{str2html .markdown}}</div>
     </div>
 </body>
 

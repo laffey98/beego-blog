@@ -10,6 +10,7 @@
     <link rel="shortcut icon " type="images/x-icon" href="static\img\32.ico">
     <link rel="stylesheet" href="http://at.alicdn.com/t/font_3280378_epazboq4thv.css">
     <link rel="stylesheet" href="static/css/github-markdown-light.css">
+    <link rel="stylesheet" href="static/css/cursor.css">
     <style>
         body {
             background-color: rgb(255, 255, 242);
@@ -54,7 +55,7 @@
 </head>
 
 <body>
-    <div>{{str2html .LayoutContent}}</div>
+    <div>{{.LayoutContent}}</div>
     <div class="md">
         <h1>归档</h1>
         {{range $id,$name:= .blog_map}}

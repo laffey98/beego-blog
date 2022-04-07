@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NotFind</title>
+    <link rel="stylesheet" href="static/css/cursor.css">
     <link rel="shortcut icon " type="images/x-icon" href="static\img\32.ico">
     <link rel="stylesheet" href="http://at.alicdn.com/t/font_3302356_fwzpi36cida.css">
     <style>

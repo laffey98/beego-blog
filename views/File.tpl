@@ -8,6 +8,7 @@
     <title>{{.title}}</title>
     <link rel="stylesheet" type="text/css" href="static\css\normal.css" />
     <link rel="stylesheet" href="http://at.alicdn.com/t/font_3280378_epazboq4thv.css">
+    <link rel="stylesheet" href="static/css/cursor.css">
     <link rel="shortcut icon " type="images/x-icon" href="static\img\32.ico">
     <style>
         body {
@@ -129,7 +130,7 @@
 </head>
 
 <body>
-    <div>{{str2html .LayoutContent}}</div>
+    <div>{{.LayoutContent}}</div>
     <div class="blog">
         <h1>在线文件服务</h1>
         <form action="http://localhost:8080/downloadblog" class="downblog">

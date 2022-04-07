@@ -8,6 +8,7 @@
     <title>laffey98的知识宝库</title>
     <!-- icon 链接 -->
     <link rel="stylesheet" href="http://at.alicdn.com/t/font_3280378_epazboq4thv.css">
+    <link rel="stylesheet" href="static/css/cursor.css">
     <link rel="shortcut icon " type="images/x-icon" href="static\img\32.ico">
     <style>
         body {

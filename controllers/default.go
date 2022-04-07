@@ -108,8 +108,12 @@ func (c *BlogController) Get() {
 		c.Data["title"] = blog.name
 		c.Layout = "NorAndMd.tpl"
 		c.TplName = "normal.tpl"
-		c.LayoutSections = make(map[string]string)
-		c.LayoutSections["markdown"] = "markdown.html"
+		markdown, err := ioutil.ReadFile(`views\markdown.html`)
+		if err != nil {
+			print.Printerr(err, place)
+			c.Abort("Notfind")
+		}
+		c.Data["markdown"] = string(markdown)
 	case blog.Id > 10000000 && blog.Id < 99999999:
 		c.Data["title"] = blog.name
 		c.Layout = "NME.tpl"
@@ -119,8 +123,13 @@ func (c *BlogController) Get() {
 			c.Abort(modtime)
 		}
 		c.Data["writetime"] = modtime
+		markdown, err := ioutil.ReadFile(`views\markdown.html`)
+		if err != nil {
+			print.Printerr(err, place)
+			c.Abort("Notfind")
+		}
+		c.Data["markdown"] = string(markdown)
 		c.LayoutSections = make(map[string]string)
-		c.LayoutSections["markdown"] = "markdown.html"
 		c.LayoutSections["ex_blog"] = "ex_blog.tpl"
 	default:
 		c.Abort("Notfind")
