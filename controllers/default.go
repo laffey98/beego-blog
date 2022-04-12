@@ -28,6 +28,10 @@ type MainController struct {
 	beego.Controller
 }
 
+type IndexController struct {
+	beego.Controller
+}
+
 type BlogController struct {
 	beego.Controller
 }
@@ -58,6 +62,17 @@ func (c *MainController) Get() {
 	   	word, _ := beego.AppConfig.String("uploadpassword")
 	   	print.Printvar(place, word) */
 	c.TplName = "First.tpl"
+}
+
+//------------------------------------------------
+//IndexController
+//------------------------------------------------
+
+func (c *IndexController) Get() {
+	/* 	//text
+	   	word, _ := beego.AppConfig.String("uploadpassword")
+	   	print.Printvar(place, word) */
+	c.TplName = "Index.tpl"
 }
 
 //------------------------------------------------
