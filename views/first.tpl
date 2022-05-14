@@ -220,33 +220,34 @@
         <!-- 设置二维码 -->
         <div class="f">
             <k>
-                <form action="http://localhost:8080/blog">
+                <form action="http://laffey98.cn/blog">
                     <input type="submit" value="博客归档" />
                     <input type="hidden" name="id" value="2" />
                 </form>
-                <form action="http://localhost:8080/blog">
+                <form action="http://laffey98.cn/blog">
                     <input type="submit" value="站内自用" />
                     <input type="hidden" name="id" value="3" />
                 </form>
             </k>
             <k>
-                <form action="http://localhost:8080/blog">
+                <form action="http://laffey98.cn/blog">
                     <input type="submit" value="关于我" />
                     <input type="hidden" name="id" value="4" />
                 </form>
-                <form action="http://localhost:8080/file">
+                <form action="http://laffey98.cn/file">
                     <input type="submit" value="资源下载" />
                 </form>
             </k>
             <k>
                 <a target="_blank" href="https://github.com/laffey98"><i class="iconfont icon-github"
                         title="GitHub"></i></a>
-                <a href="http://localhost:8080/blog?id=5"><i class="iconfont icon-qq" title="QQ"></i></a>
-                <a href="http://localhost:8080/blog?id=5"><i class="iconfont icon-weixin" title="WeiXin"></i></a>
+                <a href="http://laffey98.cn/blog?id=5"><i class="iconfont icon-qq" title="QQ"></i></a>
+                <a href="http://laffey98.cn/blog?id=5"><i class="iconfont icon-weixin" title="WeiXin"></i></a>
             </k>
 
         </div>
     </div>
+    <a   style="color: white;height: 5%;position: absolute;bottom: 0px;text-decoration:none;width:100%;text-align: center;" href="http://beian.miit.gov.cn/" target="_blank"> 赣ICP备2022004363号</a>
 </body>
 
 </html>

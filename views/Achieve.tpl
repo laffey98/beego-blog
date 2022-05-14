@@ -59,14 +59,13 @@
     <div class="md">
         <h1>归档</h1>
         {{range $id,$name:= .blog_map}}
-        <form action="http://localhost:8080/blog">
+        <form action="http://laffey98.cn/blog">
             {{if gt $id 100}}
             <input type="submit" value={{$name}} />
             <input type="hidden" name="id" value={{printf "%d" ($id) }} />
             {{end}}
         </form>{{end}}
     </div>
-
 </body>
 
 </html>

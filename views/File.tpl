@@ -133,20 +133,20 @@
     <div>{{.LayoutContent}}</div>
     <div class="blog">
         <h1>在线文件服务</h1>
-        <form action="http://localhost:8080/downloadblog" class="downblog">
+        <form action="http://laffey98.cn/downloadblog" class="downblog">
             <input type="submit" value="下载博客" />
         </form>
-        <form action="http://localhost:8080/file" method="post" enctype="multipart/form-data">
+        <form action="http://laffey98.cn/file" method="post" enctype="multipart/form-data">
             上传博客：<input type="file" name="blogname" />
             <input type="password" name="blogpassword" placeholder="上传博客密钥">
             <input type="submit" value="提交" />
         </form>
     </div>
     <div class="file">
-        <form action="http://localhost:8080/downloadfile" class="downblog">
+        <form action="http://laffey98.cn/downloadfile" class="downblog">
             <input type="submit" value="下载文件" />
         </form>
-        <form action="http://localhost:8080/file" method="post" enctype="multipart/form-data">
+        <form action="http://laffey98.cn/file" method="post" enctype="multipart/form-data">
             上传文件：<input type="file" name="filename" />
             <input type="password" name="filepassword" placeholder="上传文件密钥">
             <input type="submit" value="提交" />

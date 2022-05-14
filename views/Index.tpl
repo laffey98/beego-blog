@@ -7,6 +7,7 @@
     <title>默认页面</title>
 </head>
 <body>
-    <p>这是一个默认页面</p>
+    <p>这是一个默认页面，暂时保留，建议访问http://laffey98.cn/first/</p>
+    <a style="height: 5%;position: fixed;bottom: Opx,;width:100%;text-align: center;" href="http://beian.miit.gov.cn/" target="_blank"> 赣ICP备2022004363号</a>
 </body>
 </html>
